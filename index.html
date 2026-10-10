@@ -68,7 +68,7 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid
 .result{border-top:1px dashed var(--line);padding-top:16px;display:flex;flex-direction:column;gap:12px}
 .verdict{font-family:var(--display);font-size:22px}
 .verdict.ok{color:var(--good)} .verdict.ng{color:var(--bad)}
-.new{font-family:var(--body);font-size:12px;font-weight:700;background:var(--lamp);color:#1d2419;border-radius:3px;padding:1px 7px;margin-left:8px;vertical-align:middle;letter-spacing:.06em}
+.new{white-space:nowrap;display:inline-block;font-family:var(--body);font-size:12px;font-weight:700;background:var(--lamp);color:#1d2419;border-radius:3px;padding:1px 7px;margin-left:8px;vertical-align:middle;letter-spacing:.06em}
 .who{font-weight:700;font-size:15px;color:var(--muted)}
 .who b{color:var(--fg);font-size:18px}
 .story{margin:0}
@@ -119,6 +119,21 @@ h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0}
 /* 用語：タップで説明 */
 .term{all:unset;cursor:pointer;color:inherit;text-decoration:underline dotted;text-decoration-color:var(--accent);text-decoration-thickness:2px;text-underline-offset:4px;border-radius:2px}
 .term:hover{background:color-mix(in srgb,var(--lamp) 25%,transparent)}
+.term.person{text-decoration-style:solid;text-decoration-thickness:1.5px;font-weight:inherit}
+.pop.wide{width:min(360px,calc(100vw - 32px));max-height:min(70vh,560px);overflow-y:auto}
+.pop .py{display:block;font-size:12px;opacity:.75;margin:-2px 0 8px}
+.pop .pf{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin:0 0 8px;font-size:13px}
+.pop .pf dt{opacity:.7;white-space:nowrap}
+.pop .pf dd{margin:0}
+.pop .pd{margin:0 0 10px}
+.pop .ph{margin:0 0 6px;font-size:12px;letter-spacing:.1em;opacity:.8;font-weight:700;border-top:1px solid color-mix(in srgb,var(--board-ink) 25%,transparent);padding-top:10px}
+.pop .rels{display:flex;flex-wrap:wrap;gap:6px}
+.pop .rel{font:inherit;font-size:13px;font-weight:700;border-radius:999px;padding:4px 12px;border:1.5px solid var(--lamp);background:transparent;color:var(--lamp)}
+.pop button.rel:hover{background:color-mix(in srgb,var(--lamp) 20%,transparent)}
+.pop .rel.locked{border-style:dashed;border-color:color-mix(in srgb,var(--board-ink) 40%,transparent);color:color-mix(in srgb,var(--board-ink) 60%,transparent);font-weight:500}
+.gl-nick{font-size:12px;font-weight:500;color:var(--muted);margin-left:8px}
+.dex .who-line{font-size:13px;color:var(--muted)}
+.dex details.hit{border-color:var(--lamp);box-shadow:0 0 0 2px color-mix(in srgb,var(--lamp) 40%,transparent)}
 .term:focus-visible{outline:2px solid var(--lamp);outline-offset:1px}
 .tane .term,.book .term{text-decoration-color:color-mix(in srgb,var(--note-ink) 60%,transparent)}
 .talk .term{text-decoration-color:color-mix(in srgb,var(--talk-ink) 55%,transparent)}
@@ -187,6 +202,7 @@ h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0}
 
 <script src="gloss.js"></script>
 <script src="neta.js"></script>
+<script src="people.js"></script>
 <script>
 /* ===== 基本 ===== */
 const $ = id => document.getElementById(id);
@@ -211,16 +227,37 @@ const dexN = () => NETA.filter(d=>DEX[d.id]).length;
 const drawDexCount = () => { $("dexCount").textContent = `${dexN()}/${NETA.length}`; };
 
 /* ===== 用語（タップで説明）===== */
-const TERM = {};
-Object.entries(GLOSS).forEach(([cat,o])=>Object.entries(o).forEach(([t,x])=>TERM[t]={cat,x}));
+const TERM = {}, WHO = {};
+/* 人物カードがある人は、用語集の同じ項目より人物カードを優先する */
+Object.entries(PEOPLE).forEach(([k,p]) => { WHO[k] = k; (p.aka||[]).forEach(a => WHO[a] = k); });
+Object.entries(GLOSS).forEach(([cat,o])=>Object.entries(o).forEach(([t,x])=>{ if (!WHO[t]) TERM[t]={cat,x}; }));
 const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
-const TERM_RE = new RegExp(Object.keys(TERM).sort((a,b)=>b.length-a.length).map(esc).join("|"),"g");
-const L = s => s.replace(TERM_RE, m => `<button type="button" class="term" data-t="${m}">${m}</button>`);
+const TERM_RE = new RegExp([...Object.keys(TERM), ...Object.keys(WHO)].sort((a,b)=>b.length-a.length).map(esc).join("|"),"g");
+const L = s => s.replace(TERM_RE, m => WHO[m] ? `<button type="button" class="term person" data-p="${WHO[m]}">${m}</button>` : `<button type="button" class="term" data-t="${m}">${m}</button>`);
+/* その人が出てくるネタ（タグか本文に名前がある） */
+function related(k){
+  const names = [k, ...(PEOPLE[k].aka||[])];
+  return NETA.filter(d => (d.tags||[]).includes(k) || names.some(n => [d.name,d.q,d.story,d.tane].some(s => s && s.includes(n))));
+}
 const pop = $("pop");
 let popFrom = null;
+function personHTML(k){
+  const p = PEOPLE[k], rel = related(k), got = rel.filter(d=>DEX[d.id]).length;
+  const list = rel.map(d => DEX[d.id] ? `<button class="rel" data-id="${d.id}">${d.nick}</button>` : `<span class="rel locked">？？？</span>`).join("");
+  return `<span class="pc">選手・監督</span><span class="pt">${k}</span><span class="py">${p.yomi}</span>
+    <dl class="pf">${p.nick?`<dt>呼び名</dt><dd>${p.nick}</dd>`:""}<dt>主な球団</dt><dd>${p.teams}</dd>${p.era?`<dt>時代</dt><dd>${p.era}</dd>`:""}</dl>
+    <p class="pd">${p.desc}</p>
+    ${rel.length ? `<p class="ph">このゲームの話　${got} / ${rel.length}</p><div class="rels">${list}</div>` : ""}`;
+}
 function showPop(el){
-  const t = el.dataset.t, g = TERM[t];
-  pop.innerHTML = `<button class="px" aria-label="閉じる">×</button><span class="pc">${g.cat}</span><span class="pt">${t}</span>${g.x}`;
+  if (el.dataset.p){
+    pop.innerHTML = `<button class="px" aria-label="閉じる">×</button>${personHTML(el.dataset.p)}`;
+    pop.querySelectorAll(".rel[data-id]").forEach(b => b.onclick = () => { pop.hidden = true; popFrom = null; openDexAt(b.dataset.id); });
+  } else {
+    const t = el.dataset.t, g = TERM[t];
+    pop.innerHTML = `<button class="px" aria-label="閉じる">×</button><span class="pc">${g.cat}</span><span class="pt">${t}</span>${g.x}`;
+  }
+  pop.classList.toggle("wide", !!el.dataset.p);
   pop.hidden = false;
   const r = el.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight;
   const left = Math.min(Math.max(16, r.left), document.documentElement.clientWidth - w - 16);
@@ -235,7 +272,7 @@ function hidePop(){ if (!pop.hidden){ pop.hidden = true; if (popFrom) popFrom.fo
 document.addEventListener("click", e => {
   const t = e.target.closest(".term");
   if (t){ e.preventDefault(); if (popFrom===t) hidePop(); else showPop(t); return; }
-  if (!e.target.closest("#pop")) { pop.hidden = true; popFrom = null; }
+  if (!e.target.closest("#pop") && !e.target.closest(".who-tap")) { pop.hidden = true; popFrom = null; }
 });
 window.addEventListener("resize", () => { pop.hidden = true; popFrom = null; });
 
@@ -251,8 +288,10 @@ const glq = $("glq");
 function drawGloss(){
   const q = glq.value.trim();
   let html = "";
+  const ppl = Object.entries(PEOPLE).filter(([k,p]) => !q || [k,p.yomi,p.nick,p.teams,p.desc,...(p.aka||[])].some(s => s && s.includes(q)));
+  if (ppl.length) html += `<h3>選手・監督（タップで人物カード）</h3><dl>${ppl.map(([k,p])=>`<div><dt><button type="button" class="term person" data-p="${k}">${k}</button>${p.nick?`<span class="gl-nick">${p.nick}</span>`:""}</dt><dd>${p.teams}</dd></div>`).join("")}</dl>`;
   Object.entries(GLOSS).forEach(([cat,o])=>{
-    const rows = Object.entries(o).filter(([t,x]) => !q || t.includes(q) || x.includes(q));
+    const rows = Object.entries(o).filter(([t,x]) => !WHO[t] && (!q || t.includes(q) || x.includes(q)));
     if (rows.length) html += `<h3>${cat}</h3><dl>${rows.map(([t,x])=>`<div><dt>${t}</dt><dd>${x}</dd></div>`).join("")}</dl>`;
   });
   $("glBody").innerHTML = html || `<p class="empty">「${escH(q)}」に当てはまる言葉はありません。</p>`;
@@ -271,8 +310,8 @@ function drawDex(){
   const items = list.map(d => {
     const r = DEX[d.id];
     if (!r) return `<li class="locked"><b>${escH([...d.nick][0])}${"○".repeat(Math.min(6,[...d.nick].length-1))}</b><span>${d.g}</span><span>${d.date?`${dateLabel(d.date)}の出来事`:"まだ出会っていないネタ"}</span></li>`;
-    return `<li><details><summary><b>${d.nick}</b><span>${d.name}</span>${r.hee?"<em>へぇ</em>":""}</summary>
-      <div class="body"><p>${L(d.story)}</p><div class="tane"><span>話のタネ</span>${L(d.tane)}</div><div class="talk"><span>切り出し方</span><q>${L(d.open)}</q></div></div></details></li>`;
+    return `<li><details data-id="${d.id}"><summary><b>${d.nick}</b><span>${d.name}</span>${r.hee?"<em>へぇ</em>":""}</summary>
+      <div class="body"><p class="who-line">${L(d.name)}</p><p>${L(d.story)}</p><div class="tane"><span>話のタネ</span>${L(d.tane)}</div><div class="talk"><span>切り出し方</span><q>${L(d.open)}</q></div></div></details></li>`;
   }).join("");
   const got = list.filter(d=>DEX[d.id]).length;
   $("dexBody").innerHTML = `<p class="sub" style="margin:8px 0 12px">${dexFilter}：${got} / ${list.length}。遊んで出会ったネタがここに集まります（記録はこの端末のブラウザに残ります）。</p><ul class="dex">${items}</ul>
@@ -281,6 +320,12 @@ function drawDex(){
     $("rsYes").onclick = () => { DEX = {}; saveDex(); resetArmed = false; drawDex(); drawDexCount(); };
     $("rsNo").onclick = () => { resetArmed = false; drawDex(); };
   } else $("rsAsk").onclick = () => { resetArmed = true; drawDex(); };
+}
+function openDexAt(id){
+  dexFilter = "すべて"; resetArmed = false; drawDex();
+  if ($("dex").hidden) openSheet("dex", document.activeElement);
+  const det = $("dexBody").querySelector(`details[data-id="${id}"]`);
+  if (det){ det.open = true; det.classList.add("hit"); det.scrollIntoView({block:"start"}); det.querySelector("summary").focus({preventScroll:true}); }
 }
 $("dexOpen").onclick = e => { resetArmed = false; drawDex(); openSheet("dex", e.currentTarget); };
 
@@ -425,7 +470,7 @@ function answer(d, btn){
   const verdict = d.f==="tf" ? (ok ? `正解！ 答えは「${d.tf?"ホント":"ウソ"}」` : `残念、答えは「${d.tf?"ホント":"ウソ"}」`) : (ok ? "正解！ 1点追加" : "残念、ここは0点");
   card().insertAdjacentHTML("beforeend", `<div class="result fade">
     <div class="verdict ${ok?"ok":"ng"}">${verdict}${isNew?`<span class="new">図鑑に追加</span>`:""}</div>
-    <div class="who">${d.g==="あだ名" ? `「${d.nick}」＝<b>${d.name}</b>` : `<b>${d.nick}</b>　${d.name}`}</div>
+    <div class="who">${d.g==="あだ名" ? `「${d.nick}」＝<b>${L(d.name)}</b>` : `<b>${d.nick}</b>　${L(d.name)}`}</div>
     <p class="story">${L(d.story)}</p>
     <div class="tane"><span>話のタネ</span>${L(d.tane)}</div>
     <div class="talk"><span>切り出し方</span><q>${L(d.open)}</q></div>
