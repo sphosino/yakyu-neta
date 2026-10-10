@@ -296,7 +296,8 @@ function todayPick(){
     if (diff > 182) diff -= 365; if (diff < -182) diff += 365;
     if (!best || Math.abs(diff) < Math.abs(best.diff) || (Math.abs(diff)===Math.abs(best.diff) && diff<0)) best = {d, diff};
   });
-  return { ...best, m: now.getMonth()+1, day: now.getDate() };
+  const same = shuffle(NETA.filter(d => d.date===best.d.date));
+  return { d: same[0], diff: best.diff, also: same.slice(1), m: now.getMonth()+1, day: now.getDate() };
 }
 
 /* ===== スコアボード ===== */
@@ -323,7 +324,7 @@ function home(){
   const when = tp.diff===0 ? `今日、${tp.m}月${tp.day}日は` : `${tp.m}月${tp.day}日に一番近いのは、${dateLabel(tp.d.date)}（${Math.abs(tp.diff)}日${tp.diff<0?"前":"後"}）の`;
   const n = dexN();
   card().innerHTML = `
-    <div class="today"><span class="lbl">今日は何の日</span><p>${when}</p><span class="nm">${tp.d.nick}</span><p>${/\d{4}年/.test(tp.d.name) ? tp.d.name : `${tp.d.y}年ごろ・${tp.d.name}`}</p>
+    <div class="today"><span class="lbl">今日は何の日</span><p>${when}</p><span class="nm">${tp.d.nick}</span><p>${/\d{4}年/.test(tp.d.name) ? tp.d.name : `${tp.d.y}年ごろ・${tp.d.name}`}</p>${tp.also.length ? `<p style="opacity:.8">この日はほかにも「${tp.also.map(x=>x.nick).join("」「")}」の日（試合の中で出てきます）</p>` : ""}
       <button class="go" id="todayGo">このネタから試合開始</button></div>
     <p class="sec">遊び方を選ぶ</p>
     <div class="choices">
@@ -334,7 +335,7 @@ function home(){
     <p class="sec">ジャンルで選ぶ</p>
     <div class="chips">${GENRES.map(([nm,gs],i)=>`<button class="chip" data-gi="${i}">${nm}<small style="font-weight:500;margin-left:4px">${NETA.filter(d=>gs.includes(d.g)).length}</small></button>`).join("")}</div>
     <div class="prog"><span>図鑑 ${n} / ${NETA.length}</span><span class="bar"><i style="width:${n/NETA.length*100}%"></i></span><button class="ghost" id="homeDex" style="padding:4px 12px;font-size:13px">見る</button></div>`;
-  $("todayGo").onclick = () => start({mode:"today", first:tp.d});
+  $("todayGo").onclick = () => start({mode:"today", first:tp.d, also:tp.also});
   card().querySelectorAll("[data-m]").forEach(b => b.onclick = () => b.dataset.m==="match" ? matchMenu() : start({mode:b.dataset.m}));
   card().querySelectorAll("[data-gi]").forEach(b => b.onclick = () => start({mode:"genre", gi:+b.dataset.gi}));
   $("homeDex").onclick = e => { resetArmed = false; drawDex(); openSheet("dex", e.currentTarget); };
@@ -370,7 +371,7 @@ function nextLinked(prev, used){
 }
 function start(opt){
   let items = [], links = Array(9).fill(null);
-  if (opt.mode==="today") items = [opt.first, ...shuffle(NETA.filter(d=>d!==opt.first)).slice(0,8)];
+  if (opt.mode==="today"){ const head = [opt.first, ...(opt.also||[])]; items = [...head, ...shuffle(NETA.filter(d=>!head.includes(d)))].slice(0,9); }
   else if (opt.mode==="genre") items = shuffle(NETA.filter(d=>GENRES[opt.gi][1].includes(d.g))).slice(0,9);
   else if (opt.mode==="match"){
     const g = GEN.find(x=>x[0]===opt.gen);

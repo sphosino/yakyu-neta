@@ -23,8 +23,8 @@
 ## 中身
 
 - `index.html`：ゲーム本体
-- `neta.js`：ネタ（67個。あだ名24・名場面18・球場/応援9・助っ人6・球団/背番号5・ウラ話5。うち34個が日付つき）
-- `gloss.js`：用語集（146語）。ここに足した言葉は、本文に出てきたときに自動でタップできるようになる
+- `neta.js`：ネタ（83個。あだ名24・名場面28・球場/応援9・ウラ話8・球団/背番号8・助っ人6。うち49個が日付つきで、1〜12月すべてに出来事がある）
+- `gloss.js`：用語集（167語）。ここに足した言葉は、本文に出てきたときに自動でタップできるようになる
 
 ### ネタの足し方
 
@@ -83,3 +83,13 @@
 - [ホームラン記念日](https://bestcalendar.jp/dates/kinenbi/3618) / [国民栄誉賞の始まり（Forbes JAPAN）](https://forbesjapan.com/articles/detail/50095)
 - [西武ライオンズのレオと手塚治虫（BASEBALL KING）](https://baseballking.jp/ns/572581/)
 - [東京音頭は丸の内音頭だった（HugKum）](https://hugkum.sho.jp/609664) / [ヤクルト傘応援の岡田正泰さん（文春オンライン）](https://bunshun.jp/articles/-/54724)
+- [野茂英雄／落合博満／黒田博樹／大谷翔平／佐々木朗希／槙原寛己／村上雅則／第88回全国高等学校野球選手権大会（Wikipedia 日本語版）](https://ja.wikipedia.org/)
+- [プロ野球誕生の日](https://bestcalendar.jp/dates/kinenbi/5134) / [プロ野球の日](https://bestcalendar.jp/dates/kinenbi/1142)
+- [2月1日キャンプインの理由（J-CAST）](https://www.j-cast.com/2019/02/01349485.html?p=all)
+- [黒田博樹の広島復帰（現代ビジネス）](https://gendai.media/articles/-/41816)
+- [がんばろうKOBEとオリックス（文春オンライン）](https://bunshun.jp/articles/-/5891)
+- [2006年WBC決勝（NPB）](https://npb.jp/wbc/2006/score_fn.html) / [第1回WBCプレーバック（SPREAD）](https://spread-sports.jp/archives/177290/2)
+- [2009年WBC決勝（AFPBB）](https://www.afpbb.com/articles/-/2585675) / [イチローの決勝打（ベースボールチャンネル）](https://www.baseballchannel.jp/wbc/28447/9/)
+- [イチロー引退会見（文春オンライン）](https://bunshun.jp/articles/-/11164)
+- [早実−駒大苫小牧 決勝再試合（ベースボールチャンネル）](https://www.baseballchannel.jp/etc/285064/)
+- [ライオンと野球（ライオン株式会社）](https://www.lion.co.jp/ja/company/history/museum/05/01.php)
