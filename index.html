@@ -172,6 +172,23 @@ h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0}
 .dex .body p{margin:0}
 .dex .locked{border:1px dashed var(--line);border-radius:8px;padding:10px 12px;color:var(--muted);font-size:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:baseline}
 .dex .locked b{font-family:var(--display);font-weight:400;letter-spacing:.1em}
+/* はじめての人へ */
+.kh-league{font-family:var(--display);font-weight:400;font-size:17px;margin:20px 0 8px}
+.kh-teams{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.kh-teams li{border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:6px;background:var(--bg);padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.kh-teams li.pa{border-left-color:var(--lamp)}
+.kh-teams b{font-size:16px}
+.kh-teams .call{font-size:12px;color:var(--muted);font-weight:700;margin-left:6px}
+.kh-teams .home{font-size:13px;font-weight:700;color:var(--accent)}
+.kh-teams p{margin:0;font-size:14px;color:var(--muted);line-height:1.65}
+.sheet-body dl.kh-year{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0}
+.sheet-body .kh-year dt{font-family:var(--display);font-weight:400;font-size:14px;color:var(--accent);white-space:nowrap}
+.sheet-body .kh-year dd{color:var(--fg);margin:0;font-size:14px;line-height:1.65}
+.kh-year dd b{display:block;font-size:15px}
+.kh-lead{font-size:15px;margin:10px 0 0}
+.kh-go{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.kihon-box{border:1.5px dashed var(--line);border-radius:8px;padding:14px 18px;display:flex;flex-direction:column;gap:8px}
+.kihon-box p{margin:0;font-size:14px;color:var(--muted)}
 .reset{margin-top:24px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:13px;color:var(--muted)}
 .reset button{font-size:13px;padding:6px 12px;border-radius:6px;border:1.5px solid var(--line);background:transparent;color:var(--muted)}
 .reset button.danger{border-color:var(--bad);color:var(--bad)}
@@ -182,7 +199,7 @@ h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0}
 <div class="wrap">
   <header>
     <div class="top"><h1>プロ野球 ネタ九回勝負</h1>
-      <div class="top-btns"><button class="pill" id="dexOpen">図鑑<small id="dexCount"></small></button><button class="pill" id="glOpen">用語集</button></div>
+      <div class="top-btns"><button class="pill" id="dexOpen">図鑑<small id="dexCount"></small></button><button class="pill" id="khOpen">はじめての人へ</button><button class="pill" id="glOpen">用語集</button></div>
     </div>
     <p>1イニングにつき野球ネタをひとつ。あだ名の由来、名場面、球場や助っ人のウラ話を当てると1点。答えたあとに出る話と「切り出し方」は、そのまま誰かに話せます。点線の言葉はタップすると意味が出ます。</p>
   </header>
@@ -195,6 +212,13 @@ h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0}
     <div class="sheet-head"><div class="top"><h2 id="glTitle">用語集</h2><button class="sheet-x" data-close="gl">閉じる</button></div>
       <input id="glq" type="search" placeholder="言葉をさがす" aria-label="用語をさがす"></div>
     <div class="sheet-body" id="glBody"></div>
+  </div>
+</div>
+<div class="sheet" id="kh" hidden>
+  <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="khTitle">
+    <div class="sheet-head"><div class="top"><h2 id="khTitle">はじめての人へ</h2><button class="sheet-x" data-close="kh">閉じる</button></div>
+      <div class="chips" id="khChips"></div></div>
+    <div class="sheet-body" id="khBody"></div>
   </div>
 </div>
 <div class="sheet" id="dex" hidden>
@@ -210,6 +234,7 @@ h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0}
 <script src="neta.js"></script>
 <script src="people.js"></script>
 <script src="ima.js"></script>
+<script src="kihon.js"></script>
 <script>
 /* ===== いまの話（ima.js）を合流。期限内は「いまの話」、過ぎたら「あのころの話」 ===== */
 const TODAY_STR = (() => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`; })();
@@ -342,6 +367,27 @@ function openDexAt(id){
 }
 $("dexOpen").onclick = e => { resetArmed = false; drawDex(); openSheet("dex", e.currentTarget); };
 
+/* ===== はじめての人へ（kihon.js）===== */
+const HAS_KIHON = typeof KIHON !== "undefined";
+function drawKihon(){
+  const secs = [["teams","12球団"],["year","1年の流れ"],["rules","試合の基本"]];
+  $("khChips").innerHTML = secs.map(([id,nm])=>`<button class="chip" data-s="${id}">${nm}</button>`).join("");
+  $("khChips").querySelectorAll("[data-s]").forEach(b => b.onclick = () => $("kh-"+b.dataset.s).scrollIntoView({block:"start", behavior:"smooth"}));
+  let h = `<p class="kh-lead">日本のプロ野球は<b>12球団</b>。6球団ずつ<b>セ・リーグ</b>と<b>パ・リーグ</b>に分かれ、春から秋までそれぞれのリーグの中で優勝を争います。最後にセとパの代表が<b>日本シリーズ</b>で日本一を決めます。</p>`;
+  h += `<h3 id="kh-teams">12球団と本拠地（2026年）</h3>`;
+  Object.entries(KIHON_TEAMS).forEach(([lg,ts],li) => {
+    h += `<p class="kh-league">${lg}</p><ul class="kh-teams">${ts.map(t=>`<li class="${li?"pa":""}"><div><b>${t.name}</b><span class="call">${t.call}</span></div><span class="home">${t.home}（${t.place}）</span><p>${L(t.note)}</p></li>`).join("")}</ul>`;
+  });
+  h += `<h3 id="kh-year">プロ野球の1年</h3><dl class="kh-year">${KIHON_YEAR.map(([m,t,x])=>`<dt>${m}</dt><dd><b>${t}</b>${L(x)}</dd>`).join("")}</dl>`;
+  h += `<h3 id="kh-rules">試合の基本</h3><dl>${KIHON_RULES.map(([t,x])=>`<div><dt>${t}</dt><dd>${L(x)}</dd></div>`).join("")}</dl>`;
+  h += `<div class="kh-go"><button class="go" id="khPlay">きほんの9問で試合開始</button></div>
+    <p class="sub" style="margin-top:12px">球場の名前は命名権で変わることがあります。点線の言葉はタップすると意味が出ます。</p>`;
+  $("khBody").innerHTML = h;
+  $("khPlay").onclick = () => { closeSheet("kh"); start({mode:"kihon"}); };
+}
+const openKihon = from => { drawKihon(); openSheet("kh", from); $("khBody").scrollTop = 0; };
+if (HAS_KIHON) $("khOpen").onclick = e => openKihon(e.currentTarget); else $("khOpen").hidden = true;
+
 /* ===== 今日は何の日 ===== */
 function todayPick(){
   const now = new Date();
@@ -387,6 +433,8 @@ function home(){
     ${FRESH.length ? `<div class="ima"><span class="lbl">いまの話<small>${typeof IMA_UPDATED!=="undefined" ? `${ymd(IMA_UPDATED)}更新` : ""}</small></span>
       <ul>${FRESH.map(d=>`<li>${d.nick}</li>`).join("")}</ul>
       <button class="go" id="imaGo">いまの話から試合開始</button></div>` : ""}
+    ${HAS_KIHON ? `<div class="kihon-box"><span class="sec" style="margin:0">野球をあまり知らない人へ</span><p>セ・リーグとパ・リーグ、12球団と本拠地、1年の流れを1ページで。基本の問題で試合もできます。</p>
+      <div class="row"><button class="go" id="khPlayHome">きほんの9問で試合開始</button><button class="ghost" id="khHome">きほんを読む</button></div></div>` : ""}
     <p class="sec">遊び方を選ぶ</p>
     <div class="choices">
       <button class="ch" data-m="mix"><b>ごちゃまぜ</b><span class="sub2">全${NETA.length}ネタからランダムに9つ</span></button>
@@ -398,6 +446,7 @@ function home(){
     <div class="prog"><span>図鑑 ${n} / ${NETA.length}</span><span class="bar"><i style="width:${n/NETA.length*100}%"></i></span><button class="ghost" id="homeDex" style="padding:4px 12px;font-size:13px">見る</button></div>`;
   $("todayGo").onclick = () => start({mode:"today", first:tp.d, also:tp.also});
   if ($("imaGo")) $("imaGo").onclick = () => start({mode:"ima"});
+  if ($("khHome")) { $("khHome").onclick = e => openKihon(e.currentTarget); $("khPlayHome").onclick = () => start({mode:"kihon"}); }
   card().querySelectorAll("[data-m]").forEach(b => b.onclick = () => b.dataset.m==="match" ? matchMenu() : start({mode:b.dataset.m}));
   card().querySelectorAll("[data-gi]").forEach(b => b.onclick = () => start({mode:"genre", gi:+b.dataset.gi}));
   $("homeDex").onclick = e => { resetArmed = false; drawDex(); openSheet("dex", e.currentTarget); };
@@ -446,6 +495,7 @@ function start(opt){
     items.push(cur); used.add(cur.id);
     for (let i=1;i<9;i++){ const nx = nextLinked(cur, used); items.push(nx.d); links[i] = nx.tag; used.add(nx.d.id); cur = nx.d; }
   }
+  else if (opt.mode==="kihon") items = shuffle(KIHON).slice(0,9);
   else if (opt.mode==="ima"){ const f = shuffle(FRESH); items = [...f, ...shuffle(NETA.filter(d=>!f.includes(d)))].slice(0,9); }
   else items = shuffle(NETA).slice(0,9);
   S = {mode:opt.mode, team:opt.team||null, inn:0, items, links, runs:Array(9).fill(null), hee:Array(9).fill(null), done:false, fresh:Array(9).fill(false)};
