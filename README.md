@@ -27,11 +27,11 @@
 ## 中身
 
 - `index.html`：ゲーム本体
-- `neta.js`：ネタ（114個。名場面51・あだ名24・ウラ話13・球場/応援12・球団/背番号8・助っ人6。うち68個が日付つきで、1〜12月すべてに出来事がある）
+- `neta.js`：ネタ（119個。名場面52・あだ名24・球場/応援16・ウラ話13・球団/背番号8・助っ人6。うち70個が日付つきで、1〜12月すべてに出来事がある）
 - `ima.js`：いまの話（最近の話題）。毎週月曜に更新する。`asof`（いつ時点の情報か）と `until`（いまの話として出す最終日）を持ち、`until` を過ぎると自動で「あのころの話」になって図鑑に残る
 - `people.js`：人物カード（選手・監督72人）。`aka` に呼び方（「ノムさん」「マー君」など）を入れておくと、その呼び方でもタップできる
 - `kihon.js`：「はじめての人へ」のページ（12球団と本拠地、1年の流れ、試合の基本）と、きほんの9問の問題（12問。図鑑には入らない）
-- `gloss.js`：用語集（212語）。ここに足した言葉は、本文に出てきたときに自動でタップできるようになる
+- `gloss.js`：用語集（216語）。ここに足した言葉は、本文に出てきたときに自動でタップできるようになる
 
 ### ネタの足し方
 
@@ -104,6 +104,8 @@
 - [2007年・2013年・2024年の日本シリーズ／1959年の日本シリーズ／金本知憲／衣笠祥雄／川上哲治／村山実／村田兆治／トリプルスリー／新庄剛志／古田敦也／藤村富美男／小川泰弘／稲尾和久／田淵幸一（Wikipedia 日本語版）](https://ja.wikipedia.org/)
 - [北川博敏／黒木知宏／星野仙一／岩瀬仁紀／中村剛也／掛布雅之／小林繁／2015年の日本シリーズ（Wikipedia 日本語版）](https://ja.wikipedia.org/)
 - 球跡巡り（NPB）：[序章・公式戦開催全球場データ](https://npb.jp/news/detail/20180420_01.html) / [洲崎球場](https://npb.jp/news/detail/20210129_01.html) / [戸塚球場](https://npb.jp/news/detail/20200612_02.html) / [大竹警察学校](https://npb.jp/news/detail/20210625_01.html) / [大牟田延命球場（旧）](https://npb.jp/news/detail/20260828_01.html)
+- 球跡巡り（NPB）：[平和台野球場](https://npb.jp/news/detail/20181019_04.html) / [藤井寺球場](https://npb.jp/news/detail/20240906_02.html) / [大阪スタヂアム](https://npb.jp/news/detail/20210924_04.html) / [東京スタジアム](https://npb.jp/news/detail/20190129_02.html)
+- [藤井寺球場／平和台野球場／大阪スタヂアム／川崎球場（Wikipedia 日本語版）](https://ja.wikipedia.org/)
 - [洲崎球場跡（江東区）](https://www.city.koto.lg.jp/103020/bunkasports/bunka/bunkazaisiseki/shiseki/17024.html) / [洲崎球場・広瀬叔功（Wikipedia 日本語版）](https://ja.wikipedia.org/)
 - いまの話（2026年10月11日更新）：[阪神の連覇（エイトアンド）](https://8and.jp/2026/10/03/%E9%98%AA%E7%A5%9E%E3%81%8C%E7%90%83%E5%9B%A3%E5%8F%B2%E4%B8%8A%E5%88%9D%E3%81%AE%E3%82%BB%E3%83%BB%E3%83%AA%E3%83%BC%E3%82%B0%E9%80%A3%E8%A6%87%E3%80%802%E4%BD%8D%E5%B7%A8%E4%BA%BA%E3%81%AE%E6%95%97/) / [CS第1戦（デイリー）](https://www.daily.co.jp/baseball/2026/10/10/0020914625.shtml) / [ドラフト日程（NPB）](https://npb.jp/news/detail/20260930_01.html) / [石川雅規の引退](https://note.com/mmiyauchi/n/n62c7b52c0d4f) / [栗山巧の引退試合（デイリー）](https://www.daily.co.jp/baseball/2026/06/29/0020531435.shtml) / [平野佳寿の引退（高校野球ドットコム）](https://www.hb-nippon.com/articles/16040) / [村上宗隆1年目35本塁打（スポーツ報知）](https://news.yahoo.co.jp/articles/3e6942a849fc176224baf7530f51423091664471) / [ドジャース地区シリーズ（ベースボールチャンネル）](https://www.baseballchannel.jp/mlb/293265/)
 - いまの話（2026年10月11日更新・第2便）：[DeNAファイナル進出（神奈川新聞）](https://www.kanaloco.jp/sports/baseball/baystars/article-1311634.html) / [CS第2戦（NHK）](https://news.web.nhk/newsweb/na/nd-20261011de57945) / [巨人、DeNAとのCS4度いずれも敗退（スポニチ）](https://news.yahoo.co.jp/articles/b540449c8770b5eef3bf7abfdf9d2b662c3e2c38) / [日本ハム逆王手（デイリー）](https://www.daily.co.jp/baseball/2026/10/11/0020917533.shtml) / [山本由伸、第2戦先発（デイリー）](https://www.daily.co.jp/mlb/2026/10/10/0020912951.shtml) / [ホワイトソックス地区シリーズ敗退（NHK）](https://news.web.nhk/newsweb/na/nd-20261011de57843) / [角中勝也が引退表明（デイリー）](https://www.daily.co.jp/baseball/2026/07/20/0020612248.shtml) / [角中の引退スピーチ（デイリー）](https://www.daily.co.jp/baseball/2026/10/02/0020886233.shtml) / [角中、独立L出身初の首位打者（熊本日日新聞）](https://kumanichi.com/articles/2015622) / [西勇輝の引退会見（デイリー）](https://www.daily.co.jp/tigers/2026/09/30/0020875419.shtml) / [西勇輝、通算127勝（熊本日日新聞）](https://kumanichi.com/articles/2040829)
